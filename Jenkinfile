@@ -37,7 +37,7 @@ sshagent(['85c77089-8c72-4243-bdca-621bb062611b'])
 }
 
 }
-stage ("pollscm")
+stage ("sendemailnotifications")
 {
 emailext body: '''Build Over!....
 
