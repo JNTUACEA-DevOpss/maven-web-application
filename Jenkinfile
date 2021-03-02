@@ -37,6 +37,14 @@ sshagent(['85c77089-8c72-4243-bdca-621bb062611b'])
 }
 
 }
+stage ("pollscm")
+{
+emailext body: '''Build Over!....
+
+
+Regards,
+Deepa Parnapalli''', subject: 'build over', to: 'deepaparnapalli@gmail.com'
+
 
 
 }
