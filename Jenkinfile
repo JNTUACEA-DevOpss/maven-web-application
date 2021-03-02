@@ -1,0 +1,46 @@
+node
+
+{
+def mavenHome = tool name: "Maven3.6.3"
+
+stage ("getcode")
+{
+git branch: 'development', credentialsId: '7b1e08ae-bfff-4b92-8561-00c37a044dbd', 
+url: 'https://github.com/JNTUACEA-DevOpss/maven-web-application.git'
+}
+
+stage ("build")
+{
+
+sh "${mavenHome}/bin/mvn clean package"
+}
+stage ("SonarQubereport")
+{
+
+sh "${mavenHome}/bin/mvn sonar:sonar"
+
+}
+
+stage ("Artifactoryrepo")
+{
+
+sh "${mavenHome}/bin/mvn deploy"
+
+}
+stage ("Deployappintotomcat")
+{
+
+sshagent(['85c77089-8c72-4243-bdca-621bb062611b']) 
+{
+ sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.233.6.99:/opt/apache-tomcat-9.0.41/webapps/"
+}
+
+}
+stage ("pollscm")
+{
+properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), 
+[$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([pollSCM('* * * * *')])])
+
+}
+
+}
