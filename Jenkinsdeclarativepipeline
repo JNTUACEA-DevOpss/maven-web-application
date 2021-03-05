@@ -1,0 +1,39 @@
+pipeline{
+agent any;
+tools{
+maven 'Maven3.6.3'
+}
+options{
+timestamps()
+ }
+stages{
+stage('checkoutcode'){
+steps{
+git branch: 'development', credentialsId: '7b1e08ae-bfff-4b92-8561-00c37a044dbd', url: 'https://github.com/JNTUACEA-DevOpss/maven-web-application.git'
+}
+}
+stage('build'){
+steps{
+sh "mvn clean package"
+ }
+}
+stage('sonarqubereport'){
+steps{
+sh "mvn sonar:sonar"
+}
+}
+stage('nexusreport'){
+steps{
+ sh "mvn deploy"
+}
+}
+stage('deployappintotomcatserver'){
+steps{
+sshagent(['85c77089-8c72-4243-bdca-621bb062611b'])
+{
+ sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.232.50.200:/opt/apache-tomcat-9.0.41/webapps/"
+}
+}
+}
+}
+}
